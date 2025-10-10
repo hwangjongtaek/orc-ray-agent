@@ -1,0 +1,28 @@
+{
+  "name": "example-classifier",
+  "version": "1.0.0",
+  "description": "Example ML classifier plugin",
+  "docker_image": "example-classifier:1.0.0",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "features": {
+        "type": "array",
+        "items": { "type": "number" }
+      },
+      "model_params": {
+        "type": "object"
+      }
+    },
+    "required": ["features"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "prediction": { "type": "string" },
+      "confidence": { "type": "number" },
+      "metadata": { "type": "object" }
+    },
+    "required": ["prediction"]
+  }
+}

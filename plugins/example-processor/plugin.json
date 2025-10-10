@@ -1,0 +1,29 @@
+{
+  "name": "example-processor",
+  "version": "1.0.0",
+  "description": "Example data processor plugin",
+  "docker_image": "example-processor:1.0.0",
+  "input_schema": {
+    "type": "object",
+    "properties": {
+      "data": {
+        "type": "array",
+        "items": { "type": "number" }
+      },
+      "operation": {
+        "type": "string",
+        "enum": ["sum", "average", "max", "min"]
+      }
+    },
+    "required": ["data"]
+  },
+  "output_schema": {
+    "type": "object",
+    "properties": {
+      "operation": { "type": "string" },
+      "result": { "type": "number" },
+      "input_count": { "type": "number" }
+    },
+    "required": ["operation", "result"]
+  }
+}

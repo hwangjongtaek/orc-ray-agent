@@ -1,0 +1,12 @@
+[project]
+name = "orc-ray-plugin-classifier"
+version = "1.0.0"
+description = "Orc Ray Agent - Example ML Classifier Plugin"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy==1.26.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

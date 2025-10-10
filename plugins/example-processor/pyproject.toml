@@ -1,0 +1,10 @@
+[project]
+name = "orc-ray-plugin-processor"
+version = "1.0.0"
+description = "Orc Ray Agent - Example Data Processor Plugin"
+requires-python = ">=3.13"
+dependencies = []
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"

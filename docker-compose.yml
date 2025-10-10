@@ -1,0 +1,100 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: orc-postgres
+    environment:
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=plugindb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d plugindb"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: orc-rabbitmq
+    ports:
+      - "5672:5672"    # AMQP
+      - "15672:15672"  # Management UI
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api-agent:
+    build: ./api-agent
+    container_name: orc-api-agent
+    ports:
+      - "5900:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres/plugindb
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq/
+      - SECRET_KEY=dev-secret-key-change-in-production
+      - PLUGIN_REGISTRY_URL=http://plugin-registry:8000
+    volumes:
+      - ./api-agent/app:/app/app
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  plugin-registry:
+    build: ./plugin-registry
+    container_name: orc-plugin-registry
+    ports:
+      - "5901:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://user:password@postgres/plugindb
+    volumes:
+      - ./plugin-registry/app:/app/app
+    command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+
+  ray-head:
+    image: rayproject/ray:2.9.1-py310
+    container_name: orc-ray-head
+    ports:
+      - "10001:10001"  # Ray client
+      - "8265:8265"    # Ray dashboard
+    command: ray start --head --dashboard-host 0.0.0.0 --port 10001 --block
+    volumes:
+      - ray_data:/tmp/ray
+
+  ray-worker:
+    build: ./ray-worker
+    container_name: orc-ray-worker
+    depends_on:
+      - ray-head
+      - rabbitmq
+      - plugin-registry
+    environment:
+      - RAY_HEAD_ADDRESS=ray-head:10001
+      - RABBITMQ_URL=amqp://guest:guest@rabbitmq/
+      - PLUGIN_REGISTRY_URL=http://plugin-registry:8000
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./ray-worker:/app
+    command: python main.py
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  ray_data:
