@@ -400,3 +400,107 @@ Before committing documentation changes:
 - **Code comments and identifiers**: Always English
 - **README.md**: Always English for international accessibility
 - **Localized versions**: Use suffix like `readme.ko.md`, `deployment.ko.doc.md`
+
+## DIAGRAM AND VISUALIZATION STANDARDS
+
+### PREFER MERMAID OVER ASCII ART
+
+**Use Mermaid diagrams** instead of ASCII art for all architecture and workflow diagrams.
+
+**Benefits:**
+
+- ✅ Renders natively in GitHub/GitLab/Markdown viewers
+- ✅ More maintainable (declarative syntax)
+- ✅ Better visual appearance
+- ✅ Scalable and responsive
+- ✅ Shows relationships more clearly
+
+### WHEN TO USE MERMAID
+
+Use Mermaid for:
+
+1. **Architecture Diagrams** - System components and their relationships
+2. **Workflow Diagrams** - Process flows, job lifecycles
+3. **Sequence Diagrams** - API interactions, message flows
+4. **State Diagrams** - Status transitions (e.g., job states)
+5. **Entity Relationships** - Database schemas
+
+### WHEN TO USE ASCII
+
+Keep ASCII for:
+
+1. **File Trees** - Directory structures are more readable in ASCII
+2. **Simple Tables** - Use markdown tables
+3. **Code Structure** - When showing indentation
+
+### MERMAID DIAGRAM EXAMPLES
+
+#### Flowchart (Architecture)
+
+```mermaid
+graph TB
+    User[User/Client] -->|Request| API[API Agent]
+    API --> DB[(Database)]
+    API --> MQ[Message Queue]
+
+    style User fill:#e1f5ff
+    style API fill:#fff4e6
+```
+
+#### Sequence Diagram (API Flow)
+
+```mermaid
+sequenceDiagram
+    Client->>API: POST /jobs
+    API->>DB: Save job
+    API->>MQ: Publish job
+    MQ->>Worker: Consume job
+    Worker-->>MQ: Status update
+    MQ-->>API: Update status
+```
+
+#### State Diagram (Job Lifecycle)
+
+```mermaid
+stateDiagram-v2
+    [*] --> Queued
+    Queued --> Processing
+    Processing --> Completed
+    Processing --> Failed
+    Completed --> [*]
+    Failed --> [*]
+```
+
+### MERMAID BEST PRACTICES
+
+1. **Use descriptive labels** - Not abbreviations
+2. **Add styling** for visual clarity
+3. **Use subgraphs** to group related components
+4. **Keep diagrams focused** - Maximum 10-15 nodes
+5. **Provide context** - Add caption or explanation
+
+### DIAGRAM DOCUMENTATION PATTERN
+
+```markdown
+## Component Architecture
+
+The following diagram shows the system components:
+
+```mermaid
+[Your diagram]
+```
+
+**Key Components:**
+
+- Component A: Description
+- Component B: Description
+```
+
+### TESTING DIAGRAMS
+
+Before committing:
+
+1. Test on Mermaid Live Editor (https://mermaid.live)
+2. Preview on GitHub
+3. Verify readability on mobile
+4. Ensure labels are clear
