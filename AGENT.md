@@ -403,19 +403,33 @@ Before committing documentation changes:
 
 ## DIAGRAM AND VISUALIZATION STANDARDS
 
-### PREFER MERMAID OVER ASCII ART
+### MANDATORY: USE MERMAID FOR ALL CHARTS
 
-**Use Mermaid diagrams** instead of ASCII art for all architecture and workflow diagrams.
+**ALL charts and diagrams MUST be written in Mermaid.** This is a strict requirement.
 
-**Benefits:**
+**Why Mermaid is mandatory:**
 
 - ✅ Renders natively in GitHub/GitLab/Markdown viewers
 - ✅ More maintainable (declarative syntax)
 - ✅ Better visual appearance
 - ✅ Scalable and responsive
 - ✅ Shows relationships more clearly
+- ✅ Version controllable (text-based)
+- ✅ Supports light and dark mode
 
-### WHEN TO USE MERMAID
+### LIGHT/DARK MODE COMPATIBILITY REQUIREMENT
+
+**CRITICAL:** All Mermaid diagrams MUST be visible in both light and dark modes.
+
+**Required practices:**
+
+1. **Use theme configuration** with custom variables
+2. **Apply explicit styling** with stroke borders (minimum 2px)
+3. **Choose high-contrast colors** that work in both modes
+4. **Use white or black text** based on background darkness
+5. **Test in both modes** before committing
+
+### WHEN TO USE MERMAID (Required)
 
 Use Mermaid for:
 
@@ -424,10 +438,13 @@ Use Mermaid for:
 3. **Sequence Diagrams** - API interactions, message flows
 4. **State Diagrams** - Status transitions (e.g., job states)
 5. **Entity Relationships** - Database schemas
+6. **Class Diagrams** - Data models and structures
+7. **Gantt Charts** - Project timelines
+8. **Git Graphs** - Branch strategies
 
-### WHEN TO USE ASCII
+### WHEN TO USE ASCII (Exceptions Only)
 
-Keep ASCII for:
+Keep ASCII ONLY for:
 
 1. **File Trees** - Directory structures are more readable in ASCII
 2. **Simple Tables** - Use markdown tables
@@ -435,53 +452,133 @@ Keep ASCII for:
 
 ### MERMAID DIAGRAM EXAMPLES
 
-#### Flowchart (Architecture)
+#### Flowchart (Architecture) - Light/Dark Mode Compatible
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#4A90E2','primaryTextColor':'#000','primaryBorderColor':'#2E5C8A','lineColor':'#4A90E2'}}}%%
 graph TB
     User[User/Client] -->|Request| API[API Agent]
     API --> DB[(Database)]
     API --> MQ[Message Queue]
 
-    style User fill:#e1f5ff
-    style API fill:#fff4e6
+    %% Light/Dark mode compatible styling
+    style User fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    style API fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
+    style DB fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
+    style MQ fill:#FF6F00,stroke:#E65100,stroke-width:2px,color:#fff
 ```
 
-#### Sequence Diagram (API Flow)
+**Key features:**
+
+- Theme initialization for consistency
+- Stroke borders (2px) for visibility
+- High contrast colors (Material Design palette)
+- White text on dark backgrounds
+
+#### Sequence Diagram (API Flow) - Light/Dark Mode Compatible
 
 ```mermaid
+%%{init: {'theme':'base'}}%%
 sequenceDiagram
+    participant Client
+    participant API
+    participant DB
+    participant MQ
+    participant Worker
+
     Client->>API: POST /jobs
     API->>DB: Save job
     API->>MQ: Publish job
     MQ->>Worker: Consume job
     Worker-->>MQ: Status update
     MQ-->>API: Update status
+    API-->>Client: Response
+
+    Note over Client,Worker: All interactions asynchronous
 ```
 
-#### State Diagram (Job Lifecycle)
+**Key features:**
+
+- Base theme for neutral appearance
+- Clear participant names
+- Annotations for context
+
+#### State Diagram (Job Lifecycle) - Light/Dark Mode Compatible
 
 ```mermaid
+%%{init: {'theme':'base'}}%%
 stateDiagram-v2
     [*] --> Queued
-    Queued --> Processing
-    Processing --> Completed
-    Processing --> Failed
+    Queued --> Processing: Worker picks up
+    Processing --> Completed: Success
+    Processing --> Failed: Error
     Completed --> [*]
     Failed --> [*]
+
+    note right of Processing: Plugin execution occurs here
+```
+
+**Key features:**
+
+- Base theme ensures visibility
+- Transition labels for clarity
+- Annotations for complex states
+
+### LIGHT/DARK MODE STYLING GUIDELINES
+
+#### Required Color Properties
+
+Every styled node MUST include:
+
+```mermaid
+style NodeName fill:#HexColor,stroke:#HexColor,stroke-width:2px,color:#TextColor
+```
+
+#### Recommended Color Palette (Material Design)
+
+**Works in both light and dark modes:**
+
+| Purpose       | Fill Color | Stroke Color | Text Color | Usage               |
+| ------------- | ---------- | ------------ | ---------- | ------------------- |
+| Primary       | #4A90E2    | #2E5C8A      | #fff       | Main components     |
+| Secondary     | #FF9800    | #E65100      | #fff       | Supporting services |
+| Success       | #4CAF50    | #2E7D32      | #fff       | Database, storage   |
+| Warning       | #FF6F00    | #E65100      | #fff       | Queues, async       |
+| Error         | #E91E63    | #AD1457      | #fff       | Failed states       |
+| Info          | #2196F3    | #1565C0      | #fff       | Information nodes   |
+| Light Element | #64B5F6    | #1976D2      | #000       | Internal components |
+
+#### Theme Configuration Template
+
+Always start diagrams with theme configuration:
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {
+  'primaryColor':'#4A90E2',
+  'primaryTextColor':'#000',
+  'primaryBorderColor':'#2E5C8A',
+  'lineColor':'#4A90E2',
+  'secondaryColor':'#82B1FF',
+  'tertiaryColor':'#B3E5FC'
+}}}%%
 ```
 
 ### MERMAID BEST PRACTICES
 
-1. **Use descriptive labels** - Not abbreviations
-2. **Add styling** for visual clarity
-3. **Use subgraphs** to group related components
-4. **Keep diagrams focused** - Maximum 10-15 nodes
-5. **Provide context** - Add caption or explanation
+1. **ALWAYS use theme initialization** - First line of every diagram
+2. **ALWAYS add explicit styling** - Never rely on defaults
+3. **Use descriptive labels** - Not abbreviations
+4. **Add stroke borders** - Minimum 2px width for visibility
+5. **Choose appropriate text color** - White (#fff) on dark fills, Black (#000) on light fills
+6. **Use subgraphs** to group related components
+7. **Keep diagrams focused** - Maximum 10-15 nodes
+8. **Provide context** - Add caption or explanation
+9. **Test in both modes** - Preview in GitHub light and dark mode
+10. **Use consistent color coding** - Same component types use same colors
 
 ### DIAGRAM DOCUMENTATION PATTERN
 
-```markdown
+````markdown
 ## Component Architecture
 
 The following diagram shows the system components:
@@ -489,18 +586,68 @@ The following diagram shows the system components:
 ```mermaid
 [Your diagram]
 ```
+````
 
 **Key Components:**
 
 - Component A: Description
 - Component B: Description
+
 ```
 
-### TESTING DIAGRAMS
+### TESTING DIAGRAMS (MANDATORY)
 
-Before committing:
+**CRITICAL:** All diagrams MUST be tested in both light and dark modes before committing.
 
-1. Test on Mermaid Live Editor (https://mermaid.live)
-2. Preview on GitHub
-3. Verify readability on mobile
-4. Ensure labels are clear
+#### Testing Checklist
+
+Before committing any diagram:
+
+- [ ] **Test on Mermaid Live Editor** (https://mermaid.live)
+  - Toggle between light and dark theme
+  - Verify all text is readable
+  - Check stroke borders are visible
+- [ ] **Preview on GitHub**
+  - Test in GitHub light mode
+  - Test in GitHub dark mode
+  - Verify colors have sufficient contrast
+- [ ] **Verify readability on mobile**
+  - Check text size is adequate
+  - Ensure arrows and connections are clear
+- [ ] **Validate styling**
+  - All nodes have explicit stroke borders (2px minimum)
+  - Text colors are appropriate (#fff or #000)
+  - Fill colors provide good contrast
+- [ ] **Check accessibility**
+  - Labels are descriptive and clear
+  - Color is not the only way to distinguish elements
+  - Sufficient contrast ratios (WCAG AA minimum)
+
+#### Testing Tools
+
+1. **Mermaid Live Editor**: https://mermaid.live
+   - Toggle theme with the theme selector
+   - Export to verify rendering
+
+2. **GitHub Preview**
+   - Use browser extensions to toggle dark mode
+   - Check in actual PR preview
+
+3. **Contrast Checker**: https://webaim.org/resources/contrastchecker/
+   - Verify text/background contrast ratios
+   - Aim for 4.5:1 minimum (WCAG AA)
+
+#### Common Issues and Solutions
+
+**Problem:** Text not visible in dark mode
+**Solution:** Use white (#fff) text on dark backgrounds
+
+**Problem:** Borders disappear in one mode
+**Solution:** Add explicit stroke with contrasting color
+
+**Problem:** Colors too pale in light mode
+**Solution:** Use Material Design palette with sufficient saturation
+
+**Problem:** Diagram looks washed out
+**Solution:** Add 2px stroke borders to all elements
+```

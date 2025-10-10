@@ -107,6 +107,7 @@ docker build -t example-processor:1.0.0 .
 ## 🏗️ Architecture
 
 ```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#4A90E2','primaryTextColor':'#000','primaryBorderColor':'#2E5C8A','lineColor':'#4A90E2','secondaryColor':'#82B1FF','tertiaryColor':'#B3E5FC'}}}%%
 graph TB
     User[User / Client]
 
@@ -132,14 +133,19 @@ graph TB
 
     PluginRegistry -->|Plugin Metadata| RayWorker
 
-    style User fill:#e1f5ff
-    style APIAgent fill:#fff4e6
-    style Dashboard fill:#f3e5f5
-    style PostgreSQL fill:#e8f5e9
-    style RabbitMQ fill:#fff3e0
-    style PluginRegistry fill:#fff4e6
-    style RayCluster fill:#f1f8ff
-    style PluginContainers fill:#fce4ec
+    %% Styling for light/dark mode compatibility
+    style User fill:#4A90E2,stroke:#2E5C8A,stroke-width:2px,color:#fff
+    style APIAgent fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
+    style Dashboard fill:#9C27B0,stroke:#6A1B9A,stroke-width:2px,color:#fff
+    style PostgreSQL fill:#4CAF50,stroke:#2E7D32,stroke-width:2px,color:#fff
+    style RabbitMQ fill:#FF6F00,stroke:#E65100,stroke-width:2px,color:#fff
+    style PluginRegistry fill:#FF9800,stroke:#E65100,stroke-width:2px,color:#fff
+    style RayCluster fill:#2196F3,stroke:#1565C0,stroke-width:2px,color:#fff
+    style RayHead fill:#64B5F6,stroke:#1976D2,stroke-width:2px,color:#000
+    style RayWorker fill:#64B5F6,stroke:#1976D2,stroke-width:2px,color:#000
+    style PluginContainers fill:#E91E63,stroke:#AD1457,stroke-width:2px,color:#fff
+
+    classDef default fill:#90CAF9,stroke:#1976D2,stroke-width:2px,color:#000
 ```
 
 ## 📦 Components
