@@ -1,16 +1,17 @@
 <div align="center">
   <img src="ray-orc-agent-logo.png" alt="Ray Orc Agent Logo" width="200"/>
 
-  # Orc Ray Agent
+# Orc Ray Agent
 
-  **Ray-based Distributed ML Plugin Agent System**
+**Ray-based Distributed ML Plugin Agent System**
 
-  [![Python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
-  [![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-009688.svg)](https://fastapi.tiangolo.com)
-  [![Ray](https://img.shields.io/badge/Ray-2.9.1-00ADD8.svg)](https://www.ray.io/)
-  [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.109.0-009688.svg)](https://fastapi.tiangolo.com)
+[![Ray](https://img.shields.io/badge/Ray-2.9.1-00ADD8.svg)](https://www.ray.io/)
+[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-  A scalable MLOps platform for executing containerized ML plugins in a distributed Ray cluster with FastAPI, RabbitMQ, and PostgreSQL.
+A scalable MLOps platform for executing containerized ML plugins in a distributed Ray cluster with FastAPI, RabbitMQ, and PostgreSQL.
+
 </div>
 
 ---
@@ -66,28 +67,33 @@ make help
 <summary>Click to expand manual installation steps</summary>
 
 1. **Clone repository:**
+
 ```bash
 git clone <repository-url>
 cd orc-ray-agent
 ```
 
 2. **Configure environment:**
+
 ```bash
 cp .env.example .env
 # Edit .env with your settings
 ```
 
 3. **Start services:**
+
 ```bash
 docker-compose up -d
 ```
 
 4. **Initialize database:**
+
 ```bash
 docker-compose exec api-agent alembic upgrade head
 ```
 
 5. **Build example plugins:**
+
 ```bash
 cd plugins/example-classifier
 docker build -t example-classifier:1.0.0 .
@@ -143,29 +149,29 @@ docker build -t example-processor:1.0.0 .
 
 ## 📦 Components
 
-| Component           | Purpose                                           | Technology         |
-| ------------------- | ------------------------------------------------- | ------------------ |
-| **API Agent**       | REST API server, user authentication, job management | FastAPI, SQLAlchemy |
-| **Plugin Registry** | Plugin metadata management service                | FastAPI, PostgreSQL |
-| **Ray Worker**      | Distributed job execution engine                  | Ray, Docker SDK    |
-| **Admin Dashboard** | Web-based management interface                    | Jinja2, Tailwind, Alpine.js |
-| **Database**        | Data persistence (users, jobs, plugins)           | PostgreSQL 17      |
-| **Message Queue**   | Asynchronous job distribution & status updates    | RabbitMQ 3.13      |
+| Component           | Purpose                                              | Technology                  |
+| ------------------- | ---------------------------------------------------- | --------------------------- |
+| **API Agent**       | REST API server, user authentication, job management | FastAPI, SQLAlchemy         |
+| **Plugin Registry** | Plugin metadata management service                   | FastAPI, PostgreSQL         |
+| **Ray Worker**      | Distributed job execution engine                     | Ray, Docker SDK             |
+| **Admin Dashboard** | Web-based management interface                       | Jinja2, Tailwind, Alpine.js |
+| **Database**        | Data persistence (users, jobs, plugins)              | PostgreSQL 17               |
+| **Message Queue**   | Asynchronous job distribution & status updates       | RabbitMQ 3.13               |
 
 ## 🛠️ Technology Stack
 
-| Layer                | Technology                          |
-| -------------------- | ----------------------------------- |
-| **Backend**          | Python 3.13, FastAPI, Pydantic      |
-| **Database**         | PostgreSQL 17, SQLAlchemy 2.0       |
-| **Message Queue**    | RabbitMQ 3.13                       |
-| **Distributed Computing** | Ray 2.9.1                      |
-| **Frontend**         | Jinja2, Tailwind CSS, Alpine.js     |
-| **Containerization** | Docker, Docker Compose              |
-| **Migrations**       | Alembic                             |
-| **Testing**          | Pytest, pytest-cov                  |
-| **Code Quality**     | Ruff (linting & formatting)         |
-| **Package Manager**  | uv                                  |
+| Layer                     | Technology                      |
+| ------------------------- | ------------------------------- |
+| **Backend**               | Python 3.13, FastAPI, Pydantic  |
+| **Database**              | PostgreSQL 17, SQLAlchemy 2.0   |
+| **Message Queue**         | RabbitMQ 3.13                   |
+| **Distributed Computing** | Ray 2.9.1                       |
+| **Frontend**              | Jinja2, Tailwind CSS, Alpine.js |
+| **Containerization**      | Docker, Docker Compose          |
+| **Migrations**            | Alembic                         |
+| **Testing**               | Pytest, pytest-cov              |
+| **Code Quality**          | Ruff (linting & formatting)     |
+| **Package Manager**       | uv                              |
 
 ## 🔧 Development
 
@@ -203,12 +209,14 @@ See [docs/makefile-guide.doc.md](docs/makefile-guide.doc.md) for complete comman
 <summary>Click to expand plugin development guide</summary>
 
 1. **Create plugin structure:**
+
 ```bash
 mkdir -p plugins/my-plugin
 cd plugins/my-plugin
 ```
 
 2. **Create `main.py`:**
+
 ```python
 import sys
 import json
@@ -225,6 +233,7 @@ if __name__ == "__main__":
 ```
 
 3. **Create `plugin.json`:**
+
 ```json
 {
   "name": "my-plugin",
@@ -233,16 +242,17 @@ if __name__ == "__main__":
   "docker_image": "my-plugin:1.0.0",
   "input_schema": {
     "type": "object",
-    "properties": {"data": {"type": "string"}}
+    "properties": { "data": { "type": "string" } }
   },
   "output_schema": {
     "type": "object",
-    "properties": {"output": {"type": "string"}}
+    "properties": { "output": { "type": "string" } }
   }
 }
 ```
 
 4. **Create `Dockerfile`:**
+
 ```dockerfile
 FROM python:3.13-slim
 WORKDIR /app
@@ -253,6 +263,7 @@ ENTRYPOINT ["python", "main.py"]
 ```
 
 5. **Build and register:**
+
 ```bash
 docker build -t my-plugin:1.0.0 .
 curl -X POST http://localhost:5901/api/v1/plugins \
@@ -315,6 +326,7 @@ curl -X GET http://localhost:5901/api/v1/plugins/1
 ## 🧪 Testing
 
 The project includes 50+ tests covering:
+
 - Unit tests for models
 - Security functions tests
 - API endpoint tests
@@ -337,6 +349,7 @@ open htmlcov/index.html
 **Test Coverage Target:** 80%
 
 **Test Statistics:**
+
 - Total: 50+ tests
 - User model: 5 tests
 - Job model: 7 tests
@@ -384,6 +397,11 @@ docker-compose logs --tail=100
 
 ## 📖 Documentation
 
+### Core Guidelines (Root Level)
+
+- **[AGENT.md](AGENT.md)** - Development guidelines, TDD principles, and documentation standards
+- **[CLAUDE.md](CLAUDE.md)** - AI assistant instructions
+
 ### Specifications
 
 - **[specs/blueprint.specs.md](specs/blueprint.specs.md)** - System architecture and design (Korean, ~1800 lines)
@@ -391,12 +409,10 @@ docker-compose logs --tail=100
 
 ### Documentation
 
-- **[docs/agent.doc.md](docs/agent.doc.md)** - Development guidelines and TDD principles
 - **[docs/deployment.doc.md](docs/deployment.doc.md)** - Comprehensive deployment guide (~780 lines)
 - **[docs/implementation-status.doc.md](docs/implementation-status.doc.md)** - Implementation progress and test statistics (~345 lines)
 - **[docs/makefile-guide.doc.md](docs/makefile-guide.doc.md)** - Complete Makefile command reference (~560 lines)
 - **[docs/makefile-quickref.doc.md](docs/makefile-quickref.doc.md)** - Quick reference card (~148 lines)
-- **[docs/claude.doc.md](docs/claude.doc.md)** - AI assistant instructions
 
 ## 📈 Project Status
 
@@ -428,7 +444,7 @@ This project follows TDD (Test-Driven Development) and Tidy First principles:
 4. **Separate** structural and behavioral changes
 5. **Use clear commit messages**
 
-See [docs/agent.doc.md](docs/agent.doc.md) for detailed development guidelines.
+See [AGENT.md](AGENT.md) for detailed development guidelines.
 
 ## 📝 License
 
