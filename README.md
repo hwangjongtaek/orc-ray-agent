@@ -106,45 +106,40 @@ docker build -t example-processor:1.0.0 .
 
 ## 🏗️ Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         User / Client                        │
-└─────────────────┬───────────────────────────┬───────────────┘
-                  │                           │
-                  ▼                           ▼
-        ┌─────────────────┐        ┌─────────────────┐
-        │   API Agent     │        │Admin Dashboard  │
-        │   (FastAPI)     │◄───────┤  (Jinja2 UI)   │
-        │   Port 5900     │        └─────────────────┘
-        └────────┬────────┘
-                 │
-        ┌────────┼────────────────────────┐
-        ▼        ▼                        ▼
- ┌──────────┐ ┌──────────┐      ┌───────────────┐
- │PostgreSQL│ │RabbitMQ  │      │Plugin Registry│
- │    17    │ │   3.13   │      │  (FastAPI)    │
- └──────────┘ └────┬─────┘      │  Port 5901    │
-                   │             └───────────────┘
-                   │ job_queue
-                   │
-                   ▼
-        ┌────────────────────┐
-        │   Ray Cluster      │
-        │  ┌──────────────┐  │
-        │  │  Ray Head    │  │
-        │  │  Port 8265   │  │
-        │  └──────────────┘  │
-        │  ┌──────────────┐  │
-        │  │ Ray Worker   │  │
-        │  │ (PluginActor)│  │
-        │  └──────┬───────┘  │
-        └─────────┼──────────┘
-                  │
-                  ▼
-        ┌─────────────────┐
-        │Plugin Containers│
-        │  (Docker)       │
-        └─────────────────┘
+```mermaid
+graph TB
+    User[User / Client]
+
+    User -->|API Requests| APIAgent[API Agent<br/>FastAPI<br/>Port 5900]
+    User -->|Web UI| Dashboard[Admin Dashboard<br/>Jinja2 UI]
+
+    Dashboard -.->|Uses| APIAgent
+
+    APIAgent -->|Store Data| PostgreSQL[(PostgreSQL 17)]
+    APIAgent -->|Publish Jobs| RabbitMQ[RabbitMQ 3.13<br/>job_queue]
+    APIAgent -->|Query Metadata| PluginRegistry[Plugin Registry<br/>FastAPI<br/>Port 5901]
+
+    RabbitMQ -->|Consume Jobs| RayCluster[Ray Cluster]
+
+    subgraph RayCluster[Ray Cluster]
+        RayHead[Ray Head<br/>Port 8265]
+        RayWorker[Ray Worker<br/>PluginActor]
+        RayHead -.-> RayWorker
+    end
+
+    RayWorker -->|Execute| PluginContainers[Plugin Containers<br/>Docker]
+    RayWorker -->|Status Updates| RabbitMQ
+
+    PluginRegistry -->|Plugin Metadata| RayWorker
+
+    style User fill:#e1f5ff
+    style APIAgent fill:#fff4e6
+    style Dashboard fill:#f3e5f5
+    style PostgreSQL fill:#e8f5e9
+    style RabbitMQ fill:#fff3e0
+    style PluginRegistry fill:#fff4e6
+    style RayCluster fill:#f1f8ff
+    style PluginContainers fill:#fce4ec
 ```
 
 ## 📦 Components
