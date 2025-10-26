@@ -216,3 +216,7 @@ __marimo__/
 
 # LLM Files
 # specs/*.specs.md
+
+# Envs
+.env
+.env.docker-compose
