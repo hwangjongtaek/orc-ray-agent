@@ -9,7 +9,7 @@ services:
       - POSTGRES_PASSWORD=password
       - POSTGRES_DB=plugindb
     ports:
-      - "5432:5432"
+      - "6432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
@@ -22,8 +22,8 @@ services:
     image: rabbitmq:3.13-management
     container_name: orc-rabbitmq
     ports:
-      - "5672:5672"    # AMQP
-      - "15672:15672"  # Management UI
+      - "6672:5672"    # AMQP
+      - "16672:15672"  # Management UI
     environment:
       - RABBITMQ_DEFAULT_USER=guest
       - RABBITMQ_DEFAULT_PASS=guest
@@ -39,7 +39,7 @@ services:
     build: ./api-agent
     container_name: orc-api-agent
     ports:
-      - "5900:8000"
+      - "6900:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -58,7 +58,7 @@ services:
     build: ./plugin-registry
     container_name: orc-plugin-registry
     ports:
-      - "5901:8000"
+      - "6901:8000"
     depends_on:
       postgres:
         condition: service_healthy
@@ -69,14 +69,16 @@ services:
     command: uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 
   ray-head:
-    image: rayproject/ray:2.9.1-py310
+    build: ./ray-head
     container_name: orc-ray-head
     ports:
-      - "10001:10001"  # Ray client
-      - "8265:8265"    # Ray dashboard
-    command: ray start --head --dashboard-host 0.0.0.0 --port 10001 --block
+      - "7379:7379"    # Ray GCS server
+      - "10001:10001"  # Ray client server
+      - "9265:8265"    # Ray dashboard
     volumes:
-      - ray_data:/tmp/ray
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: ray start --head --dashboard-host 0.0.0.0 --port 7379 --ray-client-server-port 10001 --block
+    shm_size: '2gb'  # Shared memory for Ray's object store
 
   ray-worker:
     build: ./ray-worker
@@ -97,4 +99,3 @@ services:
 volumes:
   postgres_data:
   rabbitmq_data:
-  ray_data:

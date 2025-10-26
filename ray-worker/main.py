@@ -29,9 +29,10 @@ def main():
         ray.init(local_mode=True)
         logger.info("Ray initialized in local mode (debug)")
     else:
-        # Connect to Ray cluster
-        ray.init(address=settings.RAY_HEAD_ADDRESS)
-        logger.info(f"Ray initialized, connected to {settings.RAY_HEAD_ADDRESS}")
+        # Connect to Ray cluster using ray:// protocol for client connection
+        ray_address = f"ray://{settings.RAY_HEAD_ADDRESS}"
+        ray.init(address=ray_address)
+        logger.info(f"Ray initialized, connected to {ray_address}")
 
     # Create and start job queue consumer
     consumer = JobQueueConsumer(

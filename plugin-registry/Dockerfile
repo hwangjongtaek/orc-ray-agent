@@ -1,4 +1,4 @@
-FROM python:3.13-slim
+FROM python:3.12-slim
 
 WORKDIR /app
 
@@ -6,6 +6,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     gcc \
     postgresql-client \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
@@ -19,8 +20,6 @@ RUN uv pip install --system .
 
 # Copy application
 COPY ./app ./app
-COPY ./alembic ./alembic
-COPY ./alembic.ini .
 
 # Expose port
 EXPOSE 8000

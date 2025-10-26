@@ -21,7 +21,7 @@ VENV := .venv
 PYTEST := pytest
 
 # Docker
-DOCKER_COMPOSE := docker-compose
+DOCKER_COMPOSE := docker compose
 DOCKER := docker
 
 .PHONY: help
@@ -123,8 +123,8 @@ up: ## Start all services with docker-compose
 	@echo "$(BLUE)Starting all services...$(NC)"
 	$(DOCKER_COMPOSE) up -d
 	@echo "$(GREEN)✓ All services started$(NC)"
-	@echo "API Docs: http://localhost:5900/docs"
-	@echo "Dashboard: http://localhost:5900/dashboard"
+	@echo "API Docs: http://localhost:6900/docs"
+	@echo "Dashboard: http://localhost:6900/dashboard"
 
 start: up ## Alias for 'up'
 
@@ -256,12 +256,12 @@ dev: ## Start only infrastructure (postgres, rabbitmq, ray-head)
 .PHONY: dev-api
 dev-api: ## Run API agent locally with hot reload
 	@echo "$(BLUE)Starting API agent locally...$(NC)"
-	cd $(API_AGENT) && uvicorn app.main:app --reload --host 0.0.0.0 --port 5900
+	cd $(API_AGENT) && uvicorn app.main:app --reload --host 0.0.0.0 --port 6900
 
 .PHONY: dev-registry
 dev-registry: ## Run plugin registry locally with hot reload
 	@echo "$(BLUE)Starting plugin registry locally...$(NC)"
-	cd $(PLUGIN_REGISTRY) && uvicorn app.main:app --reload --host 0.0.0.0 --port 5901
+	cd $(PLUGIN_REGISTRY) && uvicorn app.main:app --reload --host 0.0.0.0 --port 6901
 
 .PHONY: dev-worker
 dev-worker: ## Run ray worker locally
@@ -393,12 +393,12 @@ build-processor: ## Build example processor plugin
 register-plugins: ## Register example plugins with registry
 	@echo "$(BLUE)Registering plugins...$(NC)"
 	@echo "Registering classifier..."
-	@curl -s -X POST http://localhost:5901/api/v1/plugins \
+	@curl -s -X POST http://localhost:6901/api/v1/plugins \
 		-H "Content-Type: application/json" \
 		-d @$(PLUGINS)/example-classifier/plugin.json || echo "$(YELLOW)Plugin may already be registered$(NC)"
 	@echo ""
 	@echo "Registering processor..."
-	@curl -s -X POST http://localhost:5901/api/v1/plugins \
+	@curl -s -X POST http://localhost:6901/api/v1/plugins \
 		-H "Content-Type: application/json" \
 		-d @$(PLUGINS)/example-processor/plugin.json || echo "$(YELLOW)Plugin may already be registered$(NC)"
 	@echo ""
@@ -407,7 +407,7 @@ register-plugins: ## Register example plugins with registry
 .PHONY: list-plugins
 list-plugins: ## List all registered plugins
 	@echo "$(BLUE)Registered plugins:$(NC)"
-	@curl -s http://localhost:5901/api/v1/plugins | python -m json.tool
+	@curl -s http://localhost:6901/api/v1/plugins | python -m json.tool
 
 # ============================================================================
 # Monitoring & Health
@@ -417,11 +417,11 @@ list-plugins: ## List all registered plugins
 health: ## Check health of all services
 	@echo "$(BLUE)Checking service health...$(NC)"
 	@echo -n "API Agent:        "
-	@curl -s http://localhost:5900/health > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
+	@curl -s http://localhost:6900/health > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
 	@echo -n "Plugin Registry:  "
-	@curl -s http://localhost:5901/health > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
+	@curl -s http://localhost:6901/health > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
 	@echo -n "RabbitMQ:         "
-	@curl -s -u guest:guest http://localhost:15672/api/overview > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
+	@curl -s -u guest:guest http://localhost:16672/api/overview > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
 	@echo -n "PostgreSQL:       "
 	@$(DOCKER_COMPOSE) exec -T postgres pg_isready -U user -d plugindb > /dev/null && echo "$(GREEN)✓ Healthy$(NC)" || echo "$(RED)✗ Unhealthy$(NC)"
 
@@ -432,44 +432,44 @@ status: ps health ## Show detailed status of all services
 dashboard-ray: ## Open Ray dashboard in browser
 	@echo "$(BLUE)Opening Ray dashboard...$(NC)"
 	@if command -v open > /dev/null; then \
-		open http://localhost:8265; \
+		open http://localhost:9265; \
 	elif command -v xdg-open > /dev/null; then \
-		xdg-open http://localhost:8265; \
+		xdg-open http://localhost:9265; \
 	else \
-		echo "Ray Dashboard: http://localhost:8265"; \
+		echo "Ray Dashboard: http://localhost:9265"; \
 	fi
 
 .PHONY: dashboard-rabbitmq
 dashboard-rabbitmq: ## Open RabbitMQ management UI in browser
 	@echo "$(BLUE)Opening RabbitMQ dashboard...$(NC)"
 	@if command -v open > /dev/null; then \
-		open http://localhost:15672; \
+		open http://localhost:16672; \
 	elif command -v xdg-open > /dev/null; then \
-		xdg-open http://localhost:15672; \
+		xdg-open http://localhost:16672; \
 	else \
-		echo "RabbitMQ Dashboard: http://localhost:15672"; \
+		echo "RabbitMQ Dashboard: http://localhost:16672"; \
 	fi
 
 .PHONY: dashboard-admin
 dashboard-admin: ## Open admin dashboard in browser
 	@echo "$(BLUE)Opening admin dashboard...$(NC)"
 	@if command -v open > /dev/null; then \
-		open http://localhost:5900/dashboard; \
+		open http://localhost:6900/dashboard; \
 	elif command -v xdg-open > /dev/null; then \
-		xdg-open http://localhost:5900/dashboard; \
+		xdg-open http://localhost:6900/dashboard; \
 	else \
-		echo "Admin Dashboard: http://localhost:5900/dashboard"; \
+		echo "Admin Dashboard: http://localhost:6900/dashboard"; \
 	fi
 
 .PHONY: api-docs
 api-docs: ## Open API documentation in browser
 	@echo "$(BLUE)Opening API docs...$(NC)"
 	@if command -v open > /dev/null; then \
-		open http://localhost:5900/docs; \
+		open http://localhost:6900/docs; \
 	elif command -v xdg-open > /dev/null; then \
-		xdg-open http://localhost:5900/docs; \
+		xdg-open http://localhost:6900/docs; \
 	else \
-		echo "API Docs: http://localhost:5900/docs"; \
+		echo "API Docs: http://localhost:6900/docs"; \
 	fi
 
 # ============================================================================
@@ -502,10 +502,10 @@ init: setup build-plugins up migrate create-admin register-plugins ## Complete i
 	@echo "$(GREEN)✓ Initialization complete!$(NC)"
 	@echo ""
 	@echo "$(BLUE)Access points:$(NC)"
-	@echo "  API Docs:     http://localhost:5900/docs"
-	@echo "  Dashboard:    http://localhost:5900/dashboard"
-	@echo "  Ray:          http://localhost:8265"
-	@echo "  RabbitMQ:     http://localhost:15672"
+	@echo "  API Docs:     http://localhost:6900/docs"
+	@echo "  Dashboard:    http://localhost:6900/dashboard"
+	@echo "  Ray:          http://localhost:9265"
+	@echo "  RabbitMQ:     http://localhost:16672"
 
 # ============================================================================
 # Quick Commands
@@ -514,7 +514,7 @@ init: setup build-plugins up migrate create-admin register-plugins ## Complete i
 .PHONY: quick-start
 quick-start: env up migrate build-plugins ## Quick start for first time (no venv)
 	@echo "$(GREEN)✓ Quick start complete!$(NC)"
-	@echo "Access API docs: http://localhost:5900/docs"
+	@echo "Access API docs: http://localhost:6900/docs"
 
 .PHONY: quick-test
 quick-test: test-unit test-api ## Quick test (unit + API tests)

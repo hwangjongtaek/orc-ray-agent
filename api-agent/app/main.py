@@ -4,11 +4,9 @@ FastAPI application entry point
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 
 from app.api.v1 import auth, jobs, users
 from app.dashboard import routes as dashboard_routes
-from app.core.config import settings
 
 app = FastAPI(
     title="Orc Ray Agent API",
